@@ -1,0 +1,72 @@
+{
+  "name": "react-theme-switch-animation",
+  "version": "0.0.1",
+  "description": "React Theme Switch Animation for ReactJS, NextJS App Router",
+  "keywords": [
+    "react",
+    "reactjs",
+    "hooks",
+    "theme",
+    "animation",
+    "switch",
+    "typescript",
+    "nextjs",
+    "dark",
+    "light"
+  ],
+  "homepage": "https://github.com/MinhOmega/react-theme-switch-animation#readme",
+  "bugs": {
+    "url": "https://github.com/MinhOmega/react-theme-switch-animation/issues"
+  },
+  "license": "MIT",
+  "author": "Vo Ngoc Quang Minh",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "build": "npm run build:ts && npm run build:css",
+    "build:css": "postcss src/style.css -o dist/style.css",
+    "build:ts": "tsc",
+    "format": "prettier --write . --config ./.prettierrc",
+    "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "eslint --fix . --ext .{js,jsx,ts,tsx} && yarn lint:styles",
+    "lint:styles": "prettier --write \"**/*.{css,scss}\" --config ./.prettierrc",
+    "prepare": "husky",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0",
+    "react-hooks-global-state": "^2.1.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "@ianvs/prettier-plugin-sort-imports": "^4.2.1",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^9.5.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.7",
+    "postcss": "^8.4.38",
+    "postcss-cli": "^11.0.0",
+    "prettier": "^3.3.2",
+    "prettier-plugin-packagejson": "^2.5.0",
+    "typescript": "^5.5.2"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

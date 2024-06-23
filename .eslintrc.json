@@ -1,0 +1,17 @@
+{
+  "extends": ["prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": "warn",
+    "no-unused-vars": "off",
+
+    "eqeqeq": "error",
+
+    //bypass
+    "react-hooks/exhaustive-deps": "off",
+    "react/display-name": "off",
+    "@next/next/no-html-link-for-pages": "warn",
+    "react/jsx-uses-react": 0,
+    "react/react-in-jsx-scope": 0
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "**/*.css": ["prettier --write"],
+  "**/*.{js,jsx,cjs,mjs,ts,tsx}": ["prettier --check --write"],
+  "**/*.{json,yml,md}": ["prettier --check --write"]
+}

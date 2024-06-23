@@ -1,0 +1,13 @@
+# @see https://prettier.io/docs/en/ignore.html
+
+# dependencies
+/node_modules
+package-lock.json
+
+/.yarn
+/out
+
+# production
+/build
+/dist
+
