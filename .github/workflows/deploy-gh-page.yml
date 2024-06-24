@@ -10,7 +10,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
       - name: Setup Node.js ⚙️
         uses: actions/setup-node@v4
         with:
-          node-version-file: "example/.nvmrc"
+          node-version-file: 'example/.nvmrc'
 
       - name: Cache dependencies ⚡
         id: cache_dependencies
@@ -33,10 +33,13 @@ jobs:
           path: example/node_modules
           key: node-modules-${{ hashFiles('example/package-lock.json') }}
 
-      - name: Install dependencies 🔧
+      - name: Install dependencies example page 🔧
         if: steps.cache_dependencies.outputs.cache-hit != 'true'
         working-directory: example
         run: npm ci
+
+      - name: Install dependencies libraries 🔧
+        run: npm install
 
       - name: Setup Pages ⚙️
         uses: actions/configure-pages@v4
