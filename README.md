@@ -5,6 +5,7 @@ This package provides a React hook (`useModeAnimation`) for toggling dark mode i
 ## Notes
 
 - The hook is only available in the browser environment. So if you use NextJS App router or any other framework is use Server Component, you should use this hook in Client Component.
+- The hook is need package `react-hooks-global-state` so you should install it first.
 
 ## Features
 
@@ -20,13 +21,13 @@ This package provides a React hook (`useModeAnimation`) for toggling dark mode i
 Install the package using npm or YARN:
 
 ```bash
-npm install react-theme-switch-animation
+npm install react-theme-switch-animation react-hooks-global-state
 ```
 
 or
 
 ```bash
-yarn add react-theme-switch-animation
+yarn add react-theme-switch-animation react-hooks-global-state
 ```
 
 ## Usage
