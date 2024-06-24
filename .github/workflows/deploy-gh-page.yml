@@ -21,28 +21,22 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ⚙️ - Cache dependencies ⚡ - Install dependencies 🔧
-        description: "Setup Node.js ⚙️ - Cache dependencies ⚡ - Install dependencies 🔧"
-        runs:
-          using: "composite"
-          steps:
-            - name: Setup Node.js ⚙️
-              uses: actions/setup-node@v4
-              with:
-                node-version-file: "example/.nvmrc"
+      - name: Setup Node.js ⚙️
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "example/.nvmrc"
 
-            - name: Cache dependencies ⚡
-              id: cache_dependencies
-              uses: actions/cache@v3
-              with:
-                path: example/node_modules
-                key: node-modules-${{ hashFiles('example/package-lock.json') }}
+      - name: Cache dependencies ⚡
+        id: cache_dependencies
+        uses: actions/cache@v3
+        with:
+          path: example/node_modules
+          key: node-modules-${{ hashFiles('example/package-lock.json') }}
 
-            - name: Install dependencies 🔧
-              working-directory: example
-              shell: bash
-              if: steps.cache_dependencies.outputs.cache-hit != 'true'
-              run: npm ci
+      - name: Install dependencies 🔧
+        if: steps.cache_dependencies.outputs.cache-hit != 'true'
+        working-directory: example
+        run: npm ci
 
       - name: Setup Pages ⚙️
         uses: actions/configure-pages@v4
@@ -56,15 +50,14 @@ jobs:
       - name: Upload artifact 📡
         uses: actions/upload-pages-artifact@v3
         with:
-          path: example./out
+          path: example/out
 
   deploy:
+    needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
-    runs-on: ubuntu-latest
-    needs: build
 
     steps:
       - name: Publish to GitHub Pages 🚀
