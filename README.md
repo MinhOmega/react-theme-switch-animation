@@ -2,6 +2,10 @@
 
 This package provides a React hook (`useModeAnimation`) for toggling dark mode in React applications with a smooth animation effect. The hook also manages the `dark` mode state and persists this setting using `localStorage`.
 
+## Notes
+
+- The hook is only available in the browser environment. So if you use NextJS App router or any other framework is use Server Component, you should use this hook in Client Component.
+
 ## Features
 
 - Toggles dark mode with an animation effect.
@@ -30,14 +34,16 @@ yarn add react-theme-switch-animation
 Here’s how to use the `useModeAnimation` hook in your React component:
 
 ```jsx
+'use client'
+
 import React from 'react'
 import { useModeAnimation } from 'react-theme-switch-animation'
 
 const MyComponent = () => {
-  const { ref, toggleDarkMode, isDarkMode } = useModeAnimation()
+  const { ref, toggleSwitchTheme, isDarkMode } = useModeAnimation()
 
   return (
-    <button ref={ref} onClick={toggleDarkMode}>
+    <button ref={ref} onClick={toggleSwitchTheme}>
       Toggle Dark Mode (Currently {isDarkMode ? 'Dark' : 'Light'} Mode)
     </button>
   )
@@ -59,7 +65,7 @@ export default MyComponent
 Returns an object containing:
 
 - `ref`: React ref for attaching to the component that will trigger the dark mode toggle.
-- `toggleDarkMode`: Function to toggle dark mode.
+- `toggleSwitchTheme`: Function to toggle dark mode.
 - `isDarkMode`: Current state of dark mode (`true` for dark, `false` for light).
 
 ## Requirements

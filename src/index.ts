@@ -10,7 +10,7 @@ const { useGlobalState } = createGlobalState(initialState)
 
 interface ModeAnimationHook {
   ref: React.RefObject<HTMLButtonElement>
-  toggleDarkMode: () => Promise<void>
+  toggleSwitchTheme: () => Promise<void>
   isDarkMode: boolean
 }
 
@@ -21,11 +21,11 @@ interface ModeAnimationOptions {
 }
 
 export const useModeAnimation = (props?: ModeAnimationOptions): ModeAnimationHook => {
-  const { duration = 750, easing = 'ease-in-out', pseudoElement = '::view-transition-new(root)' } = props
+  const { duration = 750, easing = 'ease-in-out', pseudoElement = '::view-transition-new(root)' } = props || {}
   const [isDarkMode, setIsDarkMode] = useGlobalState('isDarkMode')
   const ref = useRef<HTMLButtonElement>(null)
 
-  const toggleDarkMode = async () => {
+  const toggleSwitchTheme = async () => {
     if (
       !ref.current ||
       !(document as any).startViewTransition ||
@@ -72,7 +72,7 @@ export const useModeAnimation = (props?: ModeAnimationOptions): ModeAnimationHoo
 
   return {
     ref,
-    toggleDarkMode,
+    toggleSwitchTheme,
     isDarkMode,
   }
 }
