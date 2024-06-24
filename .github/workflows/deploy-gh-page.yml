@@ -1,7 +1,8 @@
-name: publish-to-github-pages
+name: Build and Publish to GitHub Pages
 on:
   push:
     branches:
+      - main
       - feat/improve-name-of-function-and-update-readme-with-the-example-website
 
 permissions:

@@ -20,7 +20,7 @@
 
 ## Notes
 
-- The hook is only available in the browser environment. So if you use NextJS App router or any other framework is use Server Component, you should use this hook in Client Component.
+- The hook is only available in the browser environment. So if you use NextJS App router or any other framework is use Server Component, you should use this hook in Client Component by adding directive [`use client`](https://react.dev/reference/rsc/use-client)
 - Currently working if the project is using TailwindCSS only.
 
 ## Features
@@ -73,11 +73,12 @@ export default MyComponent
 
 `useModeAnimation` accepts an optional `props` object with the following properties:
 
-| Property        | Type   | Default                         | Description                                |
-| --------------- | ------ | ------------------------------- | ------------------------------------------ |
-| `duration`      | number | `750`                           | Duration of the animation in milliseconds. |
-| `easing`        | string | `"ease-in-out"`                 | CSS easing type for the animation.         |
-| `pseudoElement` | string | `"::view-transition-new(root)"` | Pseudo-element used for the animation.     |
+| Property          | Type   | Default                         | Description                                |
+| ----------------- | ------ | ------------------------------- | ------------------------------------------ |
+| `duration`        | number | `750`                           | Duration of the animation in milliseconds. |
+| `easing`          | string | `"ease-in-out"`                 | CSS easing type for the animation.         |
+| `pseudoElement`   | string | `"::view-transition-new(root)"` | Pseudo-element used for the animation.     |
+| `globalClassName` | string | `"dark"`                        | Class name to apply to the root element.   |
 
 Returns an object containing:
 
