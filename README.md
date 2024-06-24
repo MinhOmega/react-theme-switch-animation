@@ -1,6 +1,22 @@
-# React Theme Switch Animation Hook
+<h1 align="center">
+  <h1 align="center">React Theme Switch Animation Hook</h1>
+  <p align="center">
+  This package provides a React hook for toggling dark mode in React applications with a smooth animation effect.
+  </p>
+</h1>
 
-This package provides a React hook (`useModeAnimation`) for toggling dark mode in React applications with a smooth animation effect. The hook also manages the `dark` mode state and persists this setting using `localStorage`.
+<p align="center">
+  <strong>
+    <a href="https://minhomega.github.io/react-theme-switch-animation/">Live code demo</a> |
+    <a href="https://github.com/minhomega/">Hire me here</a>
+  </strong>
+</p>
+
+## Demo
+
+<p align="center">
+  <img src="example/public/demo.gif">
+</p>
 
 ## Notes
 
