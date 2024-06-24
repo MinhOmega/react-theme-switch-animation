@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://minhomega.github.io/react-theme-switch-animation/'),
   title: 'React Theme Switch Animation',
   description:
-    'An example implementation of a theme switcher using React Context and CSS variables, ideal for React and Next.js applications.',
+    'An example implementation of a theme switcher with smooth animation using React and CSS variables, ideal for React and Next.js applications.',
   authors: [
     {
       name: 'Minh Vo Ngoc Quang',
@@ -26,6 +26,7 @@ export const metadata: Metadata = {
     'Next.js Custom Hooks',
     'ReactJS Custom Hooks',
     'Switch Theme Animation',
+    'TailwindCSS',
   ],
   creator: 'Minh Vo Ngoc Quang',
   robots: 'index, follow',
@@ -37,14 +38,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'React Theme Switch Animation',
     description:
-      'An easy-to-integrate theme switcher for React and Next.js apps, showcasing dynamic theme changes with minimal code.',
+      'An example implementation of a theme switcher with smooth animation using React and CSS variables, ideal for React and Next.js applications.',
     url: 'https://github.com/MinhOmega/react-theme-switch-animation',
     siteName: 'React Theme Switch Animation',
     images: [
       {
-        url: '/react-theme-switch-animation/demo.gif',
-        width: 1200,
-        height: 630,
+        url: '/demo.gif',
+        width: 800,
+        height: 414,
         alt: 'React Theme Switch Animation',
       },
     ],
@@ -53,8 +54,9 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'React Theme Switch Animation',
-    description: 'Learn how to implement a dynamic theme switcher using React Context and CSS variables.',
-    images: ['/react-theme-switch-animation/demo.gif'],
+    description:
+      'An example implementation of a theme switcher with smooth animation using React and CSS variables, ideal for React and Next.js applications.',
+    images: ['/demo.gif'],
     creator: '@MinhVoNgocQuang',
   },
   icons: {

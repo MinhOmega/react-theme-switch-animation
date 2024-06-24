@@ -1,14 +1,14 @@
 <h1 align="center">
   <h1 align="center">React Theme Switch Animation Hook</h1>
   <p align="center">
-  This package provides a React hook for toggling dark mode in React applications with a smooth animation effect.
+  This package provides a hook for toggling dark mode in React applications with a smooth animation effect in TailwindCSS.
   </p>
 </h1>
 
 <p align="center">
   <strong>
-    <a href="https://minhomega.github.io/react-theme-switch-animation/">Live code demo</a> |
-    <a href="https://github.com/minhomega/">Hire me here</a>
+    <a href="https://minhomega.github.io/react-theme-switch-animation/" target="_blank">Live code demo</a> |
+    <a href="https://github.com/minhomega/" target="_blank">Hire me here</a>
   </strong>
 </p>
 
@@ -21,6 +21,7 @@
 ## Notes
 
 - The hook is only available in the browser environment. So if you use NextJS App router or any other framework is use Server Component, you should use this hook in Client Component.
+- Currently working if the project is using TailwindCSS only.
 
 ## Features
 
