@@ -1,16 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { createGlobalState } from 'react-hooks-global-state'
 import './style.css'
 
 const isBrowser = typeof window !== 'undefined'
 
-const initialState = { isDarkMode: isBrowser ? localStorage.getItem('theme') === 'dark' : false }
-const { useGlobalState } = createGlobalState(initialState)
-
 interface ModeAnimationHook {
   ref: React.RefObject<HTMLButtonElement>
-  toggleDarkMode: () => Promise<void>
+  toggleSwitchTheme: () => Promise<void>
   isDarkMode: boolean
 }
 
@@ -18,14 +14,20 @@ interface ModeAnimationOptions {
   duration?: number
   easing?: string
   pseudoElement?: string
+  globalClassName?: string
 }
 
 export const useModeAnimation = (props?: ModeAnimationOptions): ModeAnimationHook => {
-  const { duration = 750, easing = 'ease-in-out', pseudoElement = '::view-transition-new(root)' } = props
-  const [isDarkMode, setIsDarkMode] = useGlobalState('isDarkMode')
+  const {
+    duration = 750,
+    easing = 'ease-in-out',
+    pseudoElement = '::view-transition-new(root)',
+    globalClassName = 'dark',
+  } = props || {}
+  const [isDarkMode, setIsDarkMode] = useState(isBrowser ? localStorage.getItem('theme') === 'dark' : false)
   const ref = useRef<HTMLButtonElement>(null)
 
-  const toggleDarkMode = async () => {
+  const toggleSwitchTheme = async () => {
     if (
       !ref.current ||
       !(document as any).startViewTransition ||
@@ -62,17 +64,17 @@ export const useModeAnimation = (props?: ModeAnimationOptions): ModeAnimationHoo
 
   useEffect(() => {
     if (isDarkMode) {
-      document.documentElement.classList.add('dark')
+      document.documentElement.classList.add(globalClassName)
       localStorage.theme = 'dark'
     } else {
-      document.documentElement.classList.remove('dark')
+      document.documentElement.classList.remove(globalClassName)
       localStorage.theme = 'light'
     }
   }, [isDarkMode])
 
   return {
     ref,
-    toggleDarkMode,
+    toggleSwitchTheme,
     isDarkMode,
   }
 }
