@@ -12,18 +12,19 @@
   </strong>
 </p>
 
-## Demo
+## 🎥 Demo
 
 <p align="center">
-  <img src="example/public/demo.gif">
+  <img src="https://github.com/user-attachments/assets/c728d9b4-a546-4fda-9d1f-7f831317cb6b">
 </p>
 
-## Notes
+## 📝 Notes
 
-- The hook is only available in the browser environment. So if you use NextJS App router or any other framework is use Server Component, you should use this hook in Client Component by adding directive [`use client`](https://react.dev/reference/rsc/use-client)
-- Currently working if the project is using TailwindCSS only.
+- The hook is only available in the browser environment. So if you use NextJS App router or any other framework that uses Server Components, you should use this hook in a Client Component by adding the directive [`use client`](https://react.dev/reference/react/use-client)
+- Currently works only if the project is using TailwindCSS
+- Ensure your project has the necessary TailwindCSS configuration for dark mode
 
-## Features
+## 🚀 Features
 
 - Toggles dark mode with an animation effect.
 - Smooth animations for theme switching.
@@ -32,7 +33,7 @@
 - Uses `localStorage` to persist the dark mode state across sessions.
 - Provides a React ref that can be attached to any component to trigger the mode change.
 
-## Installation
+## 📦 Installation
 
 Install the package using npm or YARN:
 
@@ -46,7 +47,7 @@ or
 yarn add react-theme-switch-animation
 ```
 
-## Usage
+## 📚 Usage
 
 Here’s how to use the `useModeAnimation` hook in your React component:
 
@@ -69,7 +70,7 @@ const MyComponent = () => {
 export default MyComponent
 ```
 
-## API
+## 📚 API
 
 `useModeAnimation` accepts an optional `props` object with the following properties:
 
@@ -86,15 +87,15 @@ Returns an object containing:
 - `toggleSwitchTheme`: Function to toggle dark mode.
 - `isDarkMode`: Current state of dark mode (`true` for dark, `false` for light).
 
-## Requirements
+## 📝 Requirements
 
 - React 16.8 or later (for Hooks support).
 - TypeScript for compiling the package during installation.
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request with your suggested changes.
 
-## License
+## 📜 License
 
 MIT

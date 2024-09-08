@@ -35,7 +35,8 @@
     "lint:fix": "eslint --fix . --ext .{js,jsx,ts,tsx} && yarn lint:styles",
     "lint:styles": "prettier --write \"**/*.{css,scss}\" --config ./.prettierrc",
     "prepare": "husky",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "release": "release-it"
   },
   "dependencies": {
     "react": "^17.0.0 || ^18.0.0",
@@ -45,6 +46,7 @@
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@ianvs/prettier-plugin-sort-imports": "^4.2.1",
+    "@release-it/conventional-changelog": "^8.0.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.19",
@@ -55,6 +57,7 @@
     "postcss-cli": "^11.0.0",
     "prettier": "^3.3.2",
     "prettier-plugin-packagejson": "^2.5.0",
+    "release-it": "^17.6.0",
     "typescript": "^5.5.2"
   },
   "peerDependencies": {
@@ -67,5 +70,22 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release ${version}",
+      "tagName": "v${version}"
+    },
+    "npm": {
+      "publish": true
+    },
+    "github": {
+      "release": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": "angular"
+      }
+    }
   }
 }
