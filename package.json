@@ -27,8 +27,7 @@
     "src/**/*"
   ],
   "scripts": {
-    "build": "npm run build:ts && npm run build:css",
-    "build:css": "postcss src/style.css -o dist/style.css",
+    "build": "npm run build:ts",
     "build:ts": "tsc",
     "format": "prettier --write . --config ./.prettierrc",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
