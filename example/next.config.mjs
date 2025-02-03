@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "export",
+  output: 'export',
   basePath: '/react-theme-switch-animation',
-};
+}
 
-export default nextConfig;
+export default nextConfig

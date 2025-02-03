@@ -57,7 +57,8 @@
   }
 }
 
-.dark {}
+.dark {
+}
 
 @layer utilities {
   .text-balance {

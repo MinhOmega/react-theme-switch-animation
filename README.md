@@ -74,12 +74,49 @@ export default MyComponent
 
 `useModeAnimation` accepts an optional `props` object with the following properties:
 
-| Property          | Type   | Default                         | Description                                |
-| ----------------- | ------ | ------------------------------- | ------------------------------------------ |
-| `duration`        | number | `750`                           | Duration of the animation in milliseconds. |
-| `easing`          | string | `"ease-in-out"`                 | CSS easing type for the animation.         |
-| `pseudoElement`   | string | `"::view-transition-new(root)"` | Pseudo-element used for the animation.     |
-| `globalClassName` | string | `"dark"`                        | Class name to apply to the root element.   |
+| Property           | Type                      | Default                         | Description                                          |
+| ------------------ | ------------------------- | ------------------------------- | ---------------------------------------------------- |
+| `duration`         | number                    | `750`                           | Duration of the animation in milliseconds.           |
+| `easing`           | string                    | `"ease-in-out"`                 | CSS easing type for the animation.                   |
+| `pseudoElement`    | string                    | `"::view-transition-new(root)"` | Pseudo-element used for the animation.               |
+| `globalClassName`  | string                    | `"dark"`                        | Class name to apply to the root element.             |
+| `animationType`    | ThemeAnimationType        | `ThemeAnimationType.CIRCLE`     | Type of animation effect (`CIRCLE` or `BLUR_CIRCLE`) |
+| `blurAmount`       | number                    | `2`                             | Blur intensity for blur circle animation.            |
+| `styleId`          | string                    | `"theme-switch-style"`          | ID for the style element (blur circle animation).    |
+| `isDarkMode`       | boolean                   | `false`                         | Initial dark mode state.                             |
+| `onDarkModeChange` | (isDark: boolean) => void | `undefined`                     | Callback function to handle dark mode change.        |
+
+### Animation Types
+
+The hook supports two types of animations:
+
+- `ThemeAnimationType.CIRCLE`: A clean circle expansion animation (default)
+- `ThemeAnimationType.BLUR_CIRCLE`: A circle expansion with blur effect on the edges
+
+Example usage with blur circle animation:
+
+```jsx
+'use client'
+
+import React from 'react'
+import { ThemeAnimationType, useModeAnimation } from 'react-theme-switch-animation'
+
+const MyComponent = () => {
+  const { ref, toggleSwitchTheme, isDarkMode } = useModeAnimation({
+    animationType: ThemeAnimationType.BLUR_CIRCLE,
+    blurAmount: 4, // Optional: adjust blur intensity
+    duration: 1000, // Optional: adjust animation duration
+  })
+
+  return (
+    <button ref={ref} onClick={toggleSwitchTheme}>
+      Toggle Dark Mode (Currently {isDarkMode ? 'Dark' : 'Light'} Mode)
+    </button>
+  )
+}
+
+export default MyComponent
+```
 
 Returns an object containing:
 
