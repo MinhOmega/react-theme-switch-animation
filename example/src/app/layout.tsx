@@ -71,6 +71,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.className}>
+      <head>
+        <script src="https://unpkg.com/react-scan/dist/auto.global.js" async />
+      </head>
       <body className="bg-white text-base dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">{children}</body>
     </html>
   )

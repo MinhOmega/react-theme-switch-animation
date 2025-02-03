@@ -1,8 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import './style.css'
 
 const isBrowser = typeof window !== 'undefined'
+
+// Inject base CSS for view transitions
+const injectBaseStyles = () => {
+  if (isBrowser) {
+    const styleId = 'theme-switch-base-style'
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style')
+      style.id = styleId
+      style.textContent = `
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+          animation: none;
+          mix-blend-mode: normal;
+        }
+      `
+      document.head.appendChild(style)
+    }
+  }
+}
 
 export enum ThemeAnimationType {
   CIRCLE = 'circle',
@@ -39,6 +57,11 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
     isDarkMode: externalDarkMode,
     onDarkModeChange,
   } = props || {}
+
+  // Inject base styles when the hook is initialized
+  useEffect(() => {
+    injectBaseStyles()
+  }, [])
 
   const [internalDarkMode, setInternalDarkMode] = useState(isBrowser ? localStorage.getItem('theme') === 'dark' : false)
 
