@@ -130,10 +130,17 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
     const { top, left, width, height } = ref.current.getBoundingClientRect()
     const x = left + width / 2
     const y = top + height / 2
-    const right = window.innerWidth - left
-    const bottom = window.innerHeight - top
-    const maxRadius = Math.hypot(Math.max(left, right), Math.max(top, bottom))
-    const viewportSize = Math.max(window.innerWidth, window.innerHeight)
+
+    // Calculate the distance to each corner of the viewport
+    const topLeft = Math.hypot(x, y)
+    const topRight = Math.hypot(window.innerWidth - x, y)
+    const bottomLeft = Math.hypot(x, window.innerHeight - y)
+    const bottomRight = Math.hypot(window.innerWidth - x, window.innerHeight - y)
+
+    // Find the maximum distance to ensure animation covers the entire viewport
+    const maxRadius = Math.max(topLeft, topRight, bottomLeft, bottomRight)
+
+    const viewportSize = Math.max(window.innerWidth, window.innerHeight) + 200
 
     const isHighResolution = window.innerWidth >= 3000 || window.innerHeight >= 2000
     const scaleFactor = isHighResolution ? 2.5 : 4
@@ -148,6 +155,10 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
     if (animationType === ThemeAnimationType.BLUR_CIRCLE) {
       const styleElement = document.createElement('style')
       styleElement.id = styleId
+
+      // Improved sizing and animation for corner positions
+      const blurFactor = isHighResolution ? 1.5 : 1.2
+      const finalMaskSize = Math.max(optimalMaskSize, maxRadius * 2.5)
 
       styleElement.textContent = `
         ::view-transition-group(root) {
@@ -168,7 +179,7 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
         }
         
         ::view-transition-new(root) {
-          mask: ${createBlurCircleMask(blurAmount)} 0 0 / 100% 100% no-repeat;
+          mask: ${createBlurCircleMask(blurAmount * blurFactor)} 0 0 / 100% 100% no-repeat;
           mask-position: ${x}px ${y}px;
           animation: maskScale ${duration}ms ${easing};
           transform-origin: ${x}px ${y}px;
@@ -189,8 +200,8 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
             mask-position: ${x}px ${y}px;
           }
           100% {
-            mask-size: ${optimalMaskSize}px;
-            mask-position: ${finalMaskPosition.x}px ${finalMaskPosition.y}px;
+            mask-size: ${finalMaskSize}px;
+            mask-position: ${x - finalMaskSize / 2}px ${y - finalMaskSize / 2}px;
           }
         }
       `
