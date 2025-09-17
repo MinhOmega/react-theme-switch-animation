@@ -43,6 +43,7 @@ const injectBaseStyles = () => {
 export enum ThemeAnimationType {
   CIRCLE = 'circle',
   BLUR_CIRCLE = 'blur-circle',
+  QR_SCAN = 'qr-scan',
 }
 
 interface ReactThemeSwitchAnimationHook {
@@ -177,7 +178,7 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
           };
           will-change: transform;
         }
-        
+
         ::view-transition-new(root) {
           mask: ${createBlurCircleMask(blurAmount * blurFactor)} 0 0 / 100% 100% no-repeat;
           mask-position: ${x}px ${y}px;
@@ -185,7 +186,7 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
           transform-origin: ${x}px ${y}px;
           will-change: mask-size, mask-position;
         }
-        
+
         ::view-transition-old(root),
         .dark::view-transition-old(root) {
           animation: maskScale ${duration}ms ${easing};
@@ -193,7 +194,7 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
           z-index: -1;
           will-change: mask-size, mask-position;
         }
-        
+
         @keyframes maskScale {
           0% {
             mask-size: 0px;
@@ -218,6 +219,23 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
       document.documentElement.animate(
         {
           clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${maxRadius}px at ${x}px ${y}px)`],
+        },
+        {
+          duration,
+          easing,
+          pseudoElement,
+        }
+      )
+    }
+
+    if (animationType === ThemeAnimationType.QR_SCAN) {
+      const scanLineWidth = isHighResolution ? 8 : 4
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `polygon(0% 0%, ${scanLineWidth}px 0%, ${scanLineWidth}px 100%, 0% 100%)`,
+            `polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)`,
+          ],
         },
         {
           duration,
