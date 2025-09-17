@@ -112,6 +112,16 @@ export default function Home() {
             onDarkModeChange={handleDarkModeChange}
           />
         </div>
+
+        <div className="flex flex-col items-center gap-4">
+          <h1 className="text-4xl font-bold">QR Scan Animation</h1>
+          <SwitchDarkMode
+            animationType={ThemeAnimationType.QR_SCAN}
+            styleId="qr-scan-animation"
+            isDarkMode={isDarkMode}
+            onDarkModeChange={handleDarkModeChange}
+          />
+        </div>
       </div>
 
       {/* Corner toggles - Rendered dynamically */}
