@@ -13,7 +13,17 @@ export default function Home() {
     setIsDarkMode(isDark)
   }
 
-  const animations = [
+  const animations: Array<{
+    type: ThemeAnimationType
+    title: string
+    description: string
+    icon: string
+    gradient: string
+    bgPattern: string
+    duration: string
+    easing: string
+    gifUrl?: string
+  }> = [
     {
       type: ThemeAnimationType.CIRCLE,
       title: 'Circle',
@@ -21,6 +31,8 @@ export default function Home() {
       icon: '⭕',
       gradient: 'from-blue-500 to-purple-600',
       bgPattern: 'bg-gradient-to-br',
+      duration: '750ms',
+      easing: 'ease-in-out',
     },
     {
       type: ThemeAnimationType.BLUR_CIRCLE,
@@ -29,6 +41,8 @@ export default function Home() {
       icon: '🌀',
       gradient: 'from-emerald-500 to-teal-600',
       bgPattern: 'bg-gradient-to-br',
+      duration: '750ms',
+      easing: 'ease-in-out',
     },
     {
       type: ThemeAnimationType.QR_SCAN,
@@ -37,6 +51,39 @@ export default function Home() {
       icon: '📱',
       gradient: 'from-orange-500 to-red-600',
       bgPattern: 'bg-gradient-to-br',
+      duration: '750ms',
+      easing: 'ease-in-out',
+    },
+    {
+      type: ThemeAnimationType.POLYGON,
+      title: 'Polygon',
+      description: 'Diagonal wipe sweeping across the screen',
+      icon: '🔷',
+      gradient: 'from-violet-500 to-fuchsia-600',
+      bgPattern: 'bg-gradient-to-br',
+      duration: '750ms',
+      easing: 'expo-out',
+    },
+    {
+      type: ThemeAnimationType.POLYGON_GRADIENT,
+      title: 'Polygon Gradient',
+      description: 'Diagonal wipe with a soft gradient edge',
+      icon: '📐',
+      gradient: 'from-cyan-500 to-blue-600',
+      bgPattern: 'bg-gradient-to-br',
+      duration: '1500ms',
+      easing: 'expo-out',
+    },
+    {
+      type: ThemeAnimationType.GIF,
+      title: 'Custom GIF',
+      description: 'Reveal the theme through any GIF mask',
+      icon: '🎬',
+      gradient: 'from-pink-500 to-rose-600',
+      bgPattern: 'bg-gradient-to-br',
+      duration: '2000ms',
+      easing: 'expo-in',
+      gifUrl: 'https://media.tenor.com/cyORI7kwShQAAAAi/shigure-ui-dance.gif',
     },
   ]
 
@@ -123,6 +170,7 @@ export default function Home() {
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
                     <SwitchDarkMode
                       animationType={animation.type}
+                      gifUrl={animation.gifUrl}
                       styleId={`${animation.type}-showcase`}
                       isDarkMode={isDarkMode}
                       onDarkModeChange={handleDarkModeChange}
@@ -134,11 +182,11 @@ export default function Home() {
                 <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-slate-500 dark:text-slate-400">Duration</span>
-                    <span className="font-mono text-slate-700 dark:text-slate-300">750ms</span>
+                    <span className="font-mono text-slate-700 dark:text-slate-300">{animation.duration}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm mt-2">
                     <span className="text-slate-500 dark:text-slate-400">Easing</span>
-                    <span className="font-mono text-slate-700 dark:text-slate-300">ease-in-out</span>
+                    <span className="font-mono text-slate-700 dark:text-slate-300">{animation.easing}</span>
                   </div>
                 </div>
               </div>
@@ -166,7 +214,7 @@ export default function Home() {
               {
                 icon: '🎨',
                 title: 'Multiple Animations',
-                description: 'Circle, blur circle, and QR scan effects with more coming soon',
+                description: 'Circle, blur circle, QR scan, polygon, polygon gradient, and custom GIF effects',
               },
               {
                 icon: '📱',
