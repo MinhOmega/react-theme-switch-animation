@@ -1,7 +1,7 @@
 {
   "name": "react-theme-switch-animation",
   "version": "1.0.0",
-  "description": "Beautiful, smooth animations for theme switching in React applications. Features Circle, Blur Circle, and QR Scan animations with TypeScript support.",
+  "description": "Beautiful, smooth animations for theme switching in React applications. Features Circle, Blur Circle, QR Scan, Polygon, Polygon Gradient, and Custom GIF animations with TypeScript support.",
   "keywords": [
     "react",
     "reactjs",
@@ -17,6 +17,9 @@
     "circle",
     "blur",
     "qr-scan",
+    "polygon",
+    "polygon-gradient",
+    "gif",
     "theme-toggle",
     "dark-mode",
     "tailwindcss",

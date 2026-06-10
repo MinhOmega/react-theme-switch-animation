@@ -19,11 +19,14 @@
   <img src="https://github.com/user-attachments/assets/b09898f4-c0ed-48dd-817c-c9f89bfecf2e">
 </p>
 
-### ✨ Three Animation Types Available
+### ✨ Six Animation Types Available
 
 - **🔵 Circle**: Smooth expanding circle transition
 - **🌀 Blur Circle**: Circle with elegant blur effect on the edges
 - **📱 QR Scan**: Scanning line sweeps left to right (like QR code reader)
+- **🔷 Polygon**: Diagonal wipe that sweeps across the screen
+- **📐 Polygon Gradient**: Diagonal wipe with a soft gradient edge
+- **🎬 Custom GIF**: Reveal the new theme through any GIF mask of your choice
 
 ## 📝 Notes
 
@@ -33,7 +36,7 @@
 
 ## 🚀 Features
 
-- **🎨 Multiple Animation Types**: Circle, Blur Circle, and QR Scan animations
+- **🎨 Multiple Animation Types**: Circle, Blur Circle, QR Scan, Polygon, Polygon Gradient, and Custom GIF animations
 - **⚡ High Performance**: Optimized for high-resolution displays with smooth 60fps animations
 - **🎯 View Transition API**: Leverages modern browser APIs for seamless transitions
 - **📱 Responsive Design**: Works perfectly across all device sizes and screen resolutions
@@ -84,25 +87,29 @@ export default MyComponent
 
 `useModeAnimation` accepts an optional `props` object with the following properties:
 
-| Property           | Type                      | Default                         | Description                                                   |
-| ------------------ | ------------------------- | ------------------------------- | ------------------------------------------------------------- |
-| `duration`         | number                    | `750`                           | Duration of the animation in milliseconds.                    |
-| `easing`           | string                    | `"ease-in-out"`                 | CSS easing type for the animation.                            |
-| `pseudoElement`    | string                    | `"::view-transition-new(root)"` | Pseudo-element used for the animation.                        |
-| `globalClassName`  | string                    | `"dark"`                        | Class name to apply to the root element.                      |
-| `animationType`    | ThemeAnimationType        | `ThemeAnimationType.CIRCLE`     | Type of animation effect (`CIRCLE`, `BLUR_CIRCLE`, `QR_SCAN`) |
-| `blurAmount`       | number                    | `2`                             | Blur intensity for blur circle animation.                     |
-| `styleId`          | string                    | `"theme-switch-style"`          | ID for the style element (blur circle animation).             |
-| `isDarkMode`       | boolean                   | `false`                         | Initial dark mode state.                                      |
-| `onDarkModeChange` | (isDark: boolean) => void | `undefined`                     | Callback function to handle dark mode change.                 |
+| Property           | Type                      | Default                         | Description                                                                                                 |
+| ------------------ | ------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `duration`         | number                    | `750`                           | Duration of the animation in milliseconds (defaults to `1500` for `POLYGON_GRADIENT` and `2000` for `GIF`). |
+| `easing`           | string                    | `"ease-in-out"`                 | CSS easing for the animation (defaults to an expo curve for `POLYGON`, `POLYGON_GRADIENT`, and `GIF`).      |
+| `pseudoElement`    | string                    | `"::view-transition-new(root)"` | Pseudo-element used for the animation.                                                                      |
+| `globalClassName`  | string                    | `"dark"`                        | Class name to apply to the root element.                                                                    |
+| `animationType`    | ThemeAnimationType        | `ThemeAnimationType.CIRCLE`     | Type of animation effect (`CIRCLE`, `BLUR_CIRCLE`, `QR_SCAN`, `POLYGON`, `POLYGON_GRADIENT`, `GIF`)         |
+| `blurAmount`       | number                    | `2`                             | Blur intensity for blur circle animation.                                                                   |
+| `gifUrl`           | string                    | `undefined`                     | URL of the GIF used as the reveal mask (required for the `GIF` animation type).                             |
+| `styleId`          | string                    | `"theme-switch-style"`          | ID for the injected style element (blur circle, polygon gradient, and gif animations).                      |
+| `isDarkMode`       | boolean                   | `false`                         | Initial dark mode state.                                                                                    |
+| `onDarkModeChange` | (isDark: boolean) => void | `undefined`                     | Callback function to handle dark mode change.                                                               |
 
 ### Animation Types
 
-The hook supports three types of animations:
+The hook supports six types of animations:
 
 - `ThemeAnimationType.CIRCLE`: A clean circle expansion animation (default)
 - `ThemeAnimationType.BLUR_CIRCLE`: A circle expansion with blur effect on the edges
 - `ThemeAnimationType.QR_SCAN`: A scanning line that sweeps from left to right
+- `ThemeAnimationType.POLYGON`: A diagonal wipe — toward dark it sweeps from the top-left corner, back to light from the bottom-right
+- `ThemeAnimationType.POLYGON_GRADIENT`: A diagonal wipe with a soft gradient edge expanding from the top-left corner
+- `ThemeAnimationType.GIF`: Reveals the new theme through a custom GIF mask that scales up to fill the screen (requires `gifUrl`)
 
 ### Examples for Each Animation Type
 
@@ -172,6 +179,74 @@ const QRScanAnimation = () => {
 }
 ```
 
+#### Polygon Animation
+
+```jsx
+'use client'
+
+import React from 'react'
+import { ThemeAnimationType, useModeAnimation } from 'react-theme-switch-animation'
+
+const PolygonAnimation = () => {
+  const { ref, toggleSwitchTheme, isDarkMode } = useModeAnimation({
+    animationType: ThemeAnimationType.POLYGON,
+  })
+
+  return (
+    <button ref={ref} onClick={toggleSwitchTheme}>
+      {isDarkMode ? '🌙' : '☀️'} Toggle Theme (Polygon)
+    </button>
+  )
+}
+```
+
+#### Polygon Gradient Animation
+
+```jsx
+'use client'
+
+import React from 'react'
+import { ThemeAnimationType, useModeAnimation } from 'react-theme-switch-animation'
+
+const PolygonGradientAnimation = () => {
+  const { ref, toggleSwitchTheme, isDarkMode } = useModeAnimation({
+    animationType: ThemeAnimationType.POLYGON_GRADIENT,
+    duration: 1500, // Optional: defaults to 1500ms for this animation
+  })
+
+  return (
+    <button ref={ref} onClick={toggleSwitchTheme}>
+      {isDarkMode ? '🌙' : '☀️'} Toggle Theme (Polygon Gradient)
+    </button>
+  )
+}
+```
+
+#### Custom GIF Animation
+
+```jsx
+'use client'
+
+import React from 'react'
+import { ThemeAnimationType, useModeAnimation } from 'react-theme-switch-animation'
+
+const GifAnimation = () => {
+  const { ref, toggleSwitchTheme, isDarkMode } = useModeAnimation({
+    animationType: ThemeAnimationType.GIF,
+    gifUrl: 'https://media.tenor.com/cyORI7kwShQAAAAi/shigure-ui-dance.gif', // Any GIF URL
+    duration: 2000, // Optional: defaults to 2000ms for this animation
+  })
+
+  return (
+    <button ref={ref} onClick={toggleSwitchTheme}>
+      {isDarkMode ? '🌙' : '☀️'} Toggle Theme (GIF)
+    </button>
+  )
+}
+```
+
+> **Tip:** GIFs with transparent backgrounds work best as masks — the theme is revealed through the opaque parts of the GIF. If `gifUrl` is omitted, the hook falls back to the circle animation.
+
 Returns an object containing:
 
 - `ref`: React ref for attaching to the component that will trigger the dark mode toggle.
@@ -199,6 +274,10 @@ This library is built with performance in mind:
 - React 16.8 or later (for Hooks support)
 - TypeScript for compiling the package during installation
 - TailwindCSS for styling (ensure dark mode is configured)
+
+## 🙏 Acknowledgements
+
+The polygon, polygon gradient, and GIF animations are inspired by [rudrodip/theme-toggle-effect](https://github.com/rudrodip/theme-toggle-effect).
 
 ## 🤝 Contributing
 

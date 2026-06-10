@@ -33,7 +33,7 @@ The `useModeAnimation` hook is the main export that provides:
 
 - Theme state management (localStorage persistence)
 - View Transition API integration for smooth animations
-- Two animation types: `CIRCLE` and `BLUR_CIRCLE`
+- Six animation types: `CIRCLE`, `BLUR_CIRCLE`, `QR_SCAN`, `POLYGON`, `POLYGON_GRADIENT`, and `GIF`
 - High-resolution display optimizations (>= 3000px width/height)
 - Accessibility support (respects `prefers-reduced-motion`)
 
@@ -42,6 +42,10 @@ The `useModeAnimation` hook is the main export that provides:
 - Uses the View Transition API (`document.startViewTransition`)
 - Circle animation: CSS `clip-path` with expanding circle
 - Blur circle animation: SVG mask with Gaussian blur filter
+- QR scan animation: CSS `clip-path` polygon sweeping left to right
+- Polygon animation: CSS `clip-path` diagonal wipe (direction depends on target theme)
+- Polygon gradient animation: SVG mask with gradient triangle scaling from the top-left corner
+- GIF animation: custom GIF used as a CSS mask that scales up to reveal the new theme (requires `gifUrl` prop)
 - Dynamic calculations for optimal circle positioning and sizing
 - Performance optimizations for high-resolution displays
 

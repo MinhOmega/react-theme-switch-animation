@@ -44,7 +44,30 @@ export enum ThemeAnimationType {
   CIRCLE = 'circle',
   BLUR_CIRCLE = 'blur-circle',
   QR_SCAN = 'qr-scan',
+  POLYGON = 'polygon',
+  POLYGON_GRADIENT = 'polygon-gradient',
+  GIF = 'gif',
 }
+
+// Exponential easing curves (CSS linear() approximations) used by the
+// polygon and gif animations for a snappy reveal effect
+const EXPO_OUT_EASING =
+  'linear(' +
+  '0 0%, 0.1684 2.66%, 0.3165 5.49%, 0.446 8.52%,' +
+  '0.5581 11.78%, 0.6535 15.29%, 0.7341 19.11%,' +
+  '0.8011 23.3%, 0.8557 27.93%, 0.8962 32.68%,' +
+  '0.9283 38.01%, 0.9529 44.08%, 0.9711 51.14%,' +
+  '0.9833 59.06%, 0.9915 68.74%, 1 100%' +
+  ')'
+
+const EXPO_IN_EASING =
+  'linear(' +
+  '0 0%, 0.0085 31.26%, 0.0167 40.94%, 0.0289 48.86%,' +
+  '0.0471 55.92%, 0.0717 61.99%, 0.1038 67.32%,' +
+  '0.1443 72.07%, 0.1989 76.7%, 0.2659 80.89%,' +
+  '0.3465 84.71%, 0.4419 88.22%, 0.554 91.48%,' +
+  '0.6835 94.51%, 0.8316 97.34%, 1 100%' +
+  ')'
 
 interface ReactThemeSwitchAnimationHook {
   ref: React.RefObject<HTMLButtonElement>
@@ -59,6 +82,7 @@ export interface ReactThemeSwitchAnimationProps {
   globalClassName?: string
   animationType?: ThemeAnimationType
   blurAmount?: number
+  gifUrl?: string
   styleId?: string
   isDarkMode?: boolean
   onDarkModeChange?: (isDark: boolean) => void
@@ -66,16 +90,34 @@ export interface ReactThemeSwitchAnimationProps {
 
 export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactThemeSwitchAnimationHook => {
   const {
-    duration: propsDuration = 750,
-    easing = 'ease-in-out',
+    duration: customDuration,
+    easing: customEasing,
     pseudoElement = '::view-transition-new(root)',
     globalClassName = 'dark',
     animationType = ThemeAnimationType.CIRCLE,
     blurAmount = 2,
+    gifUrl,
     styleId = 'theme-switch-style',
     isDarkMode: externalDarkMode,
     onDarkModeChange,
   } = props || {}
+
+  // Gif and polygon-gradient animations need more time to read the reveal effect
+  const propsDuration =
+    customDuration ??
+    (animationType === ThemeAnimationType.GIF
+      ? 2000
+      : animationType === ThemeAnimationType.POLYGON_GRADIENT
+        ? 1500
+        : 750)
+
+  const easing =
+    customEasing ??
+    (animationType === ThemeAnimationType.POLYGON || animationType === ThemeAnimationType.POLYGON_GRADIENT
+      ? EXPO_OUT_EASING
+      : animationType === ThemeAnimationType.GIF
+        ? EXPO_IN_EASING
+        : 'ease-in-out')
 
   const isHighResolution = typeof window !== 'undefined' && (window.innerWidth >= 3000 || window.innerHeight >= 2000)
 
@@ -111,6 +153,19 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
     const circleRadius = isHighResolution ? 20 : 25
 
     return `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100"><defs>${blurFilter}</defs><circle cx="0" cy="0" r="${circleRadius}" fill="white" filter="url(%23blur)"/></svg>')`
+  }
+
+  // Triangle with a soft gradient edge, anchored to the top-left corner
+  const createPolygonGradientMask = () => {
+    const gradient =
+      '<linearGradient id="g" x1="0" y1="0" x2="20.5" y2="20.5" gradientUnits="userSpaceOnUse">' +
+      '<stop stop-color="white"/>' +
+      '<stop offset="0.84506" stop-color="white" stop-opacity="0.99"/>' +
+      '<stop offset="0.9506" stop-color="white" stop-opacity="0"/>' +
+      '<stop offset="1" stop-color="white" stop-opacity="0"/>' +
+      '</linearGradient>'
+
+    return `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><defs>${gradient}</defs><path d="M0 0H40L0 40V0Z" fill="url(%23g)"/></svg>')`
   }
 
   const toggleSwitchTheme = async () => {
@@ -209,23 +264,129 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
       document.head.appendChild(styleElement)
     }
 
+    if (animationType === ThemeAnimationType.POLYGON_GRADIENT) {
+      const styleElement = document.createElement('style')
+      styleElement.id = styleId
+
+      // Double animation declarations: the second (linear() easing) wins in
+      // browsers that support it, the first is a fallback for those that don't
+      styleElement.textContent = `
+        ::view-transition-group(root) {
+          animation-duration: ${duration}ms;
+          animation-timing-function: ease;
+          animation-timing-function: ${easing};
+        }
+
+        ::view-transition-new(root) {
+          mask: ${createPolygonGradientMask()} top left / 0 no-repeat;
+          animation: polygonGradientScale ${duration}ms ease;
+          animation: polygonGradientScale ${duration}ms ${easing};
+          animation-fill-mode: both;
+          will-change: mask-size;
+        }
+
+        ::view-transition-old(root),
+        .${globalClassName}::view-transition-old(root) {
+          animation: polygonGradientScale ${duration}ms ease;
+          animation: polygonGradientScale ${duration}ms ${easing};
+          animation-fill-mode: both;
+          z-index: -1;
+          transform-origin: top left;
+        }
+
+        @keyframes polygonGradientScale {
+          to {
+            mask-size: 200vmax;
+          }
+        }
+      `
+      document.head.appendChild(styleElement)
+    }
+
+    if (animationType === ThemeAnimationType.GIF && gifUrl) {
+      const styleElement = document.createElement('style')
+      styleElement.id = styleId
+
+      styleElement.textContent = `
+        ::view-transition-group(root) {
+          animation-duration: ${duration}ms;
+          animation-timing-function: ease;
+          animation-timing-function: ${easing};
+        }
+
+        ::view-transition-new(root) {
+          mask: url('${gifUrl}') center / 0 no-repeat;
+          animation: gifMaskScale ${duration}ms ease;
+          animation: gifMaskScale ${duration}ms ${easing};
+          animation-fill-mode: both;
+          will-change: mask-size;
+        }
+
+        ::view-transition-old(root),
+        .${globalClassName}::view-transition-old(root) {
+          animation: gifMaskScale ${duration}ms ease;
+          animation: gifMaskScale ${duration}ms ${easing};
+          animation-fill-mode: both;
+          z-index: -1;
+        }
+
+        @keyframes gifMaskScale {
+          0% {
+            mask-size: 0;
+          }
+          10% {
+            mask-size: 50vmax;
+          }
+          90% {
+            mask-size: 50vmax;
+          }
+          100% {
+            mask-size: 2000vmax;
+          }
+        }
+      `
+      document.head.appendChild(styleElement)
+    }
+
+    if (animationType === ThemeAnimationType.GIF && !gifUrl) {
+      console.warn(
+        'react-theme-switch-animation: `gifUrl` is required for the GIF animation type. Falling back to the circle animation.'
+      )
+    }
+
     await (document as any).startViewTransition(() => {
       flushSync(() => {
         setIsDarkMode((isDarkMode) => !isDarkMode)
       })
     }).ready
 
-    if (animationType === ThemeAnimationType.CIRCLE) {
+    if (animationType === ThemeAnimationType.CIRCLE || (animationType === ThemeAnimationType.GIF && !gifUrl)) {
       document.documentElement.animate(
         {
           clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${maxRadius}px at ${x}px ${y}px)`],
         },
         {
           duration,
-          easing,
+          easing: animationType === ThemeAnimationType.CIRCLE ? easing : 'ease-in-out',
           pseudoElement,
         }
       )
+    }
+
+    if (animationType === ThemeAnimationType.POLYGON) {
+      // Diagonal wipe: toward dark it sweeps from the top-left corner,
+      // back to light it sweeps from the bottom-right corner
+      const willBeDark = !isDarkMode
+      const clipPath = willBeDark
+        ? ['polygon(50% -71%, -50% 71%, -50% 71%, 50% -71%)', 'polygon(50% -71%, -50% 71%, 50% 171%, 171% 50%)']
+        : ['polygon(171% 50%, 50% 171%, 50% 171%, 171% 50%)', 'polygon(171% 50%, 50% 171%, -50% 71%, 50% -71%)']
+
+      try {
+        document.documentElement.animate({ clipPath }, { duration, easing, pseudoElement })
+      } catch {
+        // linear() easing is not supported everywhere the View Transition API is
+        document.documentElement.animate({ clipPath }, { duration, easing: 'ease-in-out', pseudoElement })
+      }
     }
 
     if (animationType === ThemeAnimationType.QR_SCAN) {
@@ -245,7 +406,11 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
       )
     }
 
-    if (animationType === ThemeAnimationType.BLUR_CIRCLE) {
+    if (
+      animationType === ThemeAnimationType.BLUR_CIRCLE ||
+      animationType === ThemeAnimationType.POLYGON_GRADIENT ||
+      (animationType === ThemeAnimationType.GIF && gifUrl)
+    ) {
       setTimeout(() => {
         const styleElement = document.getElementById(styleId)
         if (styleElement) {
