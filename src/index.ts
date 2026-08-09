@@ -49,6 +49,13 @@ export enum ThemeAnimationType {
   GIF = 'gif',
 }
 
+export enum ThemeAnimationDirection {
+  LTR = 'ltr',
+  RTL = 'rtl',
+  TTB = 'ttb',
+  BTT = 'btt',
+}
+
 // Exponential easing curves (CSS linear() approximations) used by the
 // polygon and gif animations for a snappy reveal effect
 const EXPO_OUT_EASING =
@@ -81,6 +88,7 @@ export interface ReactThemeSwitchAnimationProps {
   pseudoElement?: string
   globalClassName?: string
   animationType?: ThemeAnimationType
+  direction?: ThemeAnimationDirection | `${ThemeAnimationDirection}`
   blurAmount?: number
   gifUrl?: string
   styleId?: string
@@ -95,6 +103,7 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
     pseudoElement = '::view-transition-new(root)',
     globalClassName = 'dark',
     animationType = ThemeAnimationType.CIRCLE,
+    direction = ThemeAnimationDirection.LTR,
     blurAmount = 2,
     gifUrl,
     styleId = 'theme-switch-style',
@@ -391,10 +400,19 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
 
     if (animationType === ThemeAnimationType.QR_SCAN) {
       const scanLineWidth = isHighResolution ? 8 : 4
+      // The scan line starts as a thin strip on one edge and expands until it
+      // covers the viewport, sweeping toward the opposite edge
+      const scanLineStart: Record<ThemeAnimationDirection, string> = {
+        [ThemeAnimationDirection.LTR]: `polygon(0% 0%, ${scanLineWidth}px 0%, ${scanLineWidth}px 100%, 0% 100%)`,
+        [ThemeAnimationDirection.RTL]: `polygon(calc(100% - ${scanLineWidth}px) 0%, 100% 0%, 100% 100%, calc(100% - ${scanLineWidth}px) 100%)`,
+        [ThemeAnimationDirection.TTB]: `polygon(0% 0%, 100% 0%, 100% ${scanLineWidth}px, 0% ${scanLineWidth}px)`,
+        [ThemeAnimationDirection.BTT]: `polygon(0% calc(100% - ${scanLineWidth}px), 100% calc(100% - ${scanLineWidth}px), 100% 100%, 0% 100%)`,
+      }
+
       document.documentElement.animate(
         {
           clipPath: [
-            `polygon(0% 0%, ${scanLineWidth}px 0%, ${scanLineWidth}px 100%, 0% 100%)`,
+            scanLineStart[direction as ThemeAnimationDirection] ?? scanLineStart[ThemeAnimationDirection.LTR],
             `polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)`,
           ],
         },

@@ -94,6 +94,7 @@ export default MyComponent
 | `pseudoElement`    | string                    | `"::view-transition-new(root)"` | Pseudo-element used for the animation.                                                                      |
 | `globalClassName`  | string                    | `"dark"`                        | Class name to apply to the root element.                                                                    |
 | `animationType`    | ThemeAnimationType        | `ThemeAnimationType.CIRCLE`     | Type of animation effect (`CIRCLE`, `BLUR_CIRCLE`, `QR_SCAN`, `POLYGON`, `POLYGON_GRADIENT`, `GIF`)         |
+| `direction`        | ThemeAnimationDirection   | `ThemeAnimationDirection.LTR`   | Sweep direction for the `QR_SCAN` animation (`LTR`, `RTL`, `TTB`, `BTT`).                                   |
 | `blurAmount`       | number                    | `2`                             | Blur intensity for blur circle animation.                                                                   |
 | `gifUrl`           | string                    | `undefined`                     | URL of the GIF used as the reveal mask (required for the `GIF` animation type).                             |
 | `styleId`          | string                    | `"theme-switch-style"`          | ID for the injected style element (blur circle, polygon gradient, and gif animations).                      |
@@ -106,7 +107,7 @@ The hook supports six types of animations:
 
 - `ThemeAnimationType.CIRCLE`: A clean circle expansion animation (default)
 - `ThemeAnimationType.BLUR_CIRCLE`: A circle expansion with blur effect on the edges
-- `ThemeAnimationType.QR_SCAN`: A scanning line that sweeps from left to right
+- `ThemeAnimationType.QR_SCAN`: A scanning line that sweeps across the screen — configurable direction via the `direction` prop (left to right by default)
 - `ThemeAnimationType.POLYGON`: A diagonal wipe — toward dark it sweeps from the top-left corner, back to light from the bottom-right
 - `ThemeAnimationType.POLYGON_GRADIENT`: A diagonal wipe with a soft gradient edge expanding from the top-left corner
 - `ThemeAnimationType.GIF`: Reveals the new theme through a custom GIF mask that scales up to fill the screen (requires `gifUrl`)
@@ -163,11 +164,12 @@ const BlurCircleAnimation = () => {
 'use client'
 
 import React from 'react'
-import { ThemeAnimationType, useModeAnimation } from 'react-theme-switch-animation'
+import { ThemeAnimationDirection, ThemeAnimationType, useModeAnimation } from 'react-theme-switch-animation'
 
 const QRScanAnimation = () => {
   const { ref, toggleSwitchTheme, isDarkMode } = useModeAnimation({
     animationType: ThemeAnimationType.QR_SCAN,
+    direction: ThemeAnimationDirection.LTR, // Optional: LTR (default), RTL, TTB, or BTT
     duration: 500, // Faster scan animation
   })
 
@@ -178,6 +180,15 @@ const QRScanAnimation = () => {
   )
 }
 ```
+
+The scan direction can be customized with `ThemeAnimationDirection`:
+
+- `ThemeAnimationDirection.LTR`: left to right (default)
+- `ThemeAnimationDirection.RTL`: right to left
+- `ThemeAnimationDirection.TTB`: top to bottom
+- `ThemeAnimationDirection.BTT`: bottom to top
+
+String literals (`'ltr'`, `'rtl'`, `'ttb'`, `'btt'`) are also accepted.
 
 #### Polygon Animation
 
