@@ -2,12 +2,20 @@
 
 import SwitchDarkMode from '@/components/switch-dark-mode'
 import { useState } from 'react'
-import { ThemeAnimationType } from '../../../src'
+import { ThemeAnimationDirection, ThemeAnimationType } from '../../../src'
+
+const qrDirections: Array<{ value: ThemeAnimationDirection; label: string; title: string }> = [
+  { value: ThemeAnimationDirection.LTR, label: '→', title: 'Left to right' },
+  { value: ThemeAnimationDirection.RTL, label: '←', title: 'Right to left' },
+  { value: ThemeAnimationDirection.TTB, label: '↓', title: 'Top to bottom' },
+  { value: ThemeAnimationDirection.BTT, label: '↑', title: 'Bottom to top' },
+]
 
 export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState(
     typeof window !== 'undefined' ? localStorage.getItem('theme') === 'dark' : false
   )
+  const [qrDirection, setQrDirection] = useState(ThemeAnimationDirection.LTR)
 
   const handleDarkModeChange = (isDark: boolean) => {
     setIsDarkMode(isDark)
@@ -47,7 +55,7 @@ export default function Home() {
     {
       type: ThemeAnimationType.QR_SCAN,
       title: 'QR Scan',
-      description: 'Scanning line sweeps left to right',
+      description: 'Scanning line sweeps in any direction',
       icon: '📱',
       gradient: 'from-orange-500 to-red-600',
       bgPattern: 'bg-gradient-to-br',
@@ -170,6 +178,7 @@ export default function Home() {
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
                     <SwitchDarkMode
                       animationType={animation.type}
+                      direction={animation.type === ThemeAnimationType.QR_SCAN ? qrDirection : undefined}
                       gifUrl={animation.gifUrl}
                       styleId={`${animation.type}-showcase`}
                       isDarkMode={isDarkMode}
@@ -178,6 +187,27 @@ export default function Home() {
                     />
                   </div>
                 </div>
+
+                {animation.type === ThemeAnimationType.QR_SCAN && (
+                  <div className="mt-4 flex justify-center gap-2">
+                    {qrDirections.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => setQrDirection(option.value)}
+                        title={option.title}
+                        aria-label={option.title}
+                        aria-pressed={qrDirection === option.value}
+                        className={`w-9 h-9 rounded-lg text-lg font-semibold border transition-colors duration-200 ${
+                          qrDirection === option.value
+                            ? 'bg-orange-500 text-white border-orange-500'
+                            : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-orange-400'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
                   <div className="flex items-center justify-between text-sm">
