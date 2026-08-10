@@ -363,29 +363,34 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
       )
     }
 
+    const willBeDark = !isDarkMode
+
     await (document as any).startViewTransition(() => {
       flushSync(() => {
-        setIsDarkMode((isDarkMode) => !isDarkMode)
+        setIsDarkMode(willBeDark)
       })
+      // Apply the theme class synchronously so the "new" snapshot is always
+      // captured in the target theme. Relying on the useEffect alone is racy:
+      // React can defer passive effects past the snapshot capture (seen on
+      // React 18 under load), which breaks the reveal animation.
+      document.documentElement.classList.toggle(globalClassName, willBeDark)
     }).ready
 
     if (animationType === ThemeAnimationType.CIRCLE || (animationType === ThemeAnimationType.GIF && !gifUrl)) {
-      document.documentElement.animate(
-        {
-          clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${maxRadius}px at ${x}px ${y}px)`],
-        },
-        {
-          duration,
-          easing: animationType === ThemeAnimationType.CIRCLE ? easing : 'ease-in-out',
-          pseudoElement,
-        }
-      )
+      const clipPath = [`circle(0px at ${x}px ${y}px)`, `circle(${maxRadius}px at ${x}px ${y}px)`]
+      const circleEasing = animationType === ThemeAnimationType.CIRCLE ? easing : 'ease-in-out'
+
+      try {
+        document.documentElement.animate({ clipPath }, { duration, easing: circleEasing, pseudoElement })
+      } catch {
+        // Some browsers support the View Transition API but not animating its
+        // pseudo-elements via WAAPI options — let the default transition run
+      }
     }
 
     if (animationType === ThemeAnimationType.POLYGON) {
       // Diagonal wipe: toward dark it sweeps from the top-left corner,
       // back to light it sweeps from the bottom-right corner
-      const willBeDark = !isDarkMode
       const clipPath = willBeDark
         ? ['polygon(50% -71%, -50% 71%, -50% 71%, 50% -71%)', 'polygon(50% -71%, -50% 71%, 50% 171%, 171% 50%)']
         : ['polygon(171% 50%, 50% 171%, 50% 171%, 171% 50%)', 'polygon(171% 50%, 50% 171%, -50% 71%, 50% -71%)']
@@ -409,19 +414,17 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
         [ThemeAnimationDirection.BTT]: `polygon(0% calc(100% - ${scanLineWidth}px), 100% calc(100% - ${scanLineWidth}px), 100% 100%, 0% 100%)`,
       }
 
-      document.documentElement.animate(
-        {
-          clipPath: [
-            scanLineStart[direction as ThemeAnimationDirection] ?? scanLineStart[ThemeAnimationDirection.LTR],
-            `polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)`,
-          ],
-        },
-        {
-          duration,
-          easing,
-          pseudoElement,
-        }
-      )
+      const clipPath = [
+        scanLineStart[direction as ThemeAnimationDirection] ?? scanLineStart[ThemeAnimationDirection.LTR],
+        `polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)`,
+      ]
+
+      try {
+        document.documentElement.animate({ clipPath }, { duration, easing, pseudoElement })
+      } catch {
+        // Some browsers support the View Transition API but not animating its
+        // pseudo-elements via WAAPI options — let the default transition run
+      }
     }
 
     if (
