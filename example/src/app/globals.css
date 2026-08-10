@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: 0 0% 100%;
@@ -54,14 +54,5 @@
     --warning-foreground: 38 92% 50%;
     --color-start: #cfcfcf;
     --color-end: #4c3ba1;
-  }
-}
-
-.dark {
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
   }
 }

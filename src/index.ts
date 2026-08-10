@@ -77,7 +77,7 @@ const EXPO_IN_EASING =
   ')'
 
 interface ReactThemeSwitchAnimationHook {
-  ref: React.RefObject<HTMLButtonElement>
+  ref: React.RefObject<HTMLButtonElement | null>
   toggleSwitchTheme: () => Promise<void>
   isDarkMode: boolean
 }
