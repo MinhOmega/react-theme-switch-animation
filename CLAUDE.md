@@ -40,10 +40,11 @@ The `useModeAnimation` hook is the main export that provides:
 ### Animation Implementation
 
 - Uses the View Transition API (`document.startViewTransition`)
-- Circle animation: CSS `clip-path` with expanding circle
+- All reveals are CSS mask animations in an injected stylesheet — WebKit supports the View Transition API but ignores WAAPI animations and `clip-path` on its pseudo-elements, so masks are the only mechanism that works across Chromium and Safari
+- Circle animation: SVG circle mask scaling up from the toggle position
 - Blur circle animation: SVG mask with Gaussian blur filter
-- QR scan animation: CSS `clip-path` polygon sweeping left to right
-- Polygon animation: CSS `clip-path` diagonal wipe (direction depends on target theme)
+- QR scan animation: solid mask strip expanding across the screen (supports 4 directions via `direction` prop)
+- Polygon animation: SVG triangle mask growing from a corner (direction depends on target theme)
 - Polygon gradient animation: SVG mask with gradient triangle scaling from the top-left corner
 - GIF animation: custom GIF used as a CSS mask that scales up to reveal the new theme (requires `gifUrl` prop)
 - Dynamic calculations for optimal circle positioning and sizing
