@@ -365,80 +365,137 @@ export const useModeAnimation = (props?: ReactThemeSwitchAnimationProps): ReactT
 
     const willBeDark = !isDarkMode
 
-    await (document as any).startViewTransition(() => {
-      flushSync(() => {
-        setIsDarkMode(willBeDark)
-      })
-      // Apply the theme class synchronously so the "new" snapshot is always
-      // captured in the target theme. Relying on the useEffect alone is racy:
-      // React can defer passive effects past the snapshot capture (seen on
-      // React 18 under load), which breaks the reveal animation.
-      document.documentElement.classList.toggle(globalClassName, willBeDark)
-    }).ready
-
+    // The reveals below are applied as mask-based CSS animations in an
+    // injected stylesheet, mirroring the blur-circle/polygon-gradient
+    // mechanism. WebKit supports the View Transition API but ignores both
+    // WAAPI animations targeting its pseudo-elements and clip-path on them
+    // (the style computes yet never clips), which left Safari running the
+    // default cross-fade instead of revealing from the toggle position.
+    // Mask animations render correctly in Chromium and WebKit alike. Each
+    // rule declares the animation twice so browsers without linear() easing
+    // fall back gracefully.
     if (animationType === ThemeAnimationType.CIRCLE || (animationType === ThemeAnimationType.GIF && !gifUrl)) {
-      const clipPath = [`circle(0px at ${x}px ${y}px)`, `circle(${maxRadius}px at ${x}px ${y}px)`]
       const circleEasing = animationType === ThemeAnimationType.CIRCLE ? easing : 'ease-in-out'
+      // The mask image is a full-bleed circle, so the visible radius is half
+      // the mask size; a little headroom avoids edge aliasing at the corners
+      const finalMaskSize = Math.ceil(maxRadius * 2.1)
+      const circleMask = `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100"><circle cx="0" cy="0" r="50" fill="white"/></svg>')`
 
-      try {
-        document.documentElement.animate({ clipPath }, { duration, easing: circleEasing, pseudoElement })
-      } catch {
-        // Some browsers support the View Transition API but not animating its
-        // pseudo-elements via WAAPI options — let the default transition run
-      }
+      const styleElement = document.createElement('style')
+      styleElement.id = styleId
+
+      styleElement.textContent = `
+        ${pseudoElement} {
+          mask: ${circleMask} 0 0 / 0 no-repeat;
+          animation: circleReveal ${duration}ms ease-in-out;
+          animation: circleReveal ${duration}ms ${circleEasing};
+          animation-fill-mode: both;
+          will-change: mask-size, mask-position;
+        }
+
+        @keyframes circleReveal {
+          from {
+            mask-size: 0px;
+            mask-position: ${x}px ${y}px;
+          }
+          to {
+            mask-size: ${finalMaskSize}px;
+            mask-position: ${x - finalMaskSize / 2}px ${y - finalMaskSize / 2}px;
+          }
+        }
+      `
+      document.head.appendChild(styleElement)
     }
 
     if (animationType === ThemeAnimationType.POLYGON) {
-      // Diagonal wipe: toward dark it sweeps from the top-left corner,
-      // back to light it sweeps from the bottom-right corner
-      const clipPath = willBeDark
-        ? ['polygon(50% -71%, -50% 71%, -50% 71%, 50% -71%)', 'polygon(50% -71%, -50% 71%, 50% 171%, 171% 50%)']
-        : ['polygon(171% 50%, 50% 171%, 50% 171%, 171% 50%)', 'polygon(171% 50%, 50% 171%, -50% 71%, 50% -71%)']
+      // Diagonal wipe: toward dark a triangle mask grows from the top-left
+      // corner, back to light it grows from the bottom-right corner
+      const trianglePath = willBeDark ? 'M0 0H40L0 40V0Z' : 'M40 40H0L40 0V40Z'
+      const maskPosition = willBeDark ? 'top left' : 'bottom right'
+      const polygonMask = `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><path d="${trianglePath}" fill="white"/></svg>')`
 
-      try {
-        document.documentElement.animate({ clipPath }, { duration, easing, pseudoElement })
-      } catch {
-        // linear() easing is not supported everywhere the View Transition API is
-        document.documentElement.animate({ clipPath }, { duration, easing: 'ease-in-out', pseudoElement })
-      }
+      const styleElement = document.createElement('style')
+      styleElement.id = styleId
+
+      styleElement.textContent = `
+        ${pseudoElement} {
+          mask: ${polygonMask} ${maskPosition} / 0 no-repeat;
+          animation: polygonReveal ${duration}ms ease-in-out;
+          animation: polygonReveal ${duration}ms ${easing};
+          animation-fill-mode: both;
+          will-change: mask-size;
+        }
+
+        @keyframes polygonReveal {
+          to {
+            mask-size: 200vmax;
+          }
+        }
+      `
+      document.head.appendChild(styleElement)
     }
 
     if (animationType === ThemeAnimationType.QR_SCAN) {
       const scanLineWidth = isHighResolution ? 8 : 4
       // The scan line starts as a thin strip on one edge and expands until it
-      // covers the viewport, sweeping toward the opposite edge
-      const scanLineStart: Record<ThemeAnimationDirection, string> = {
-        [ThemeAnimationDirection.LTR]: `polygon(0% 0%, ${scanLineWidth}px 0%, ${scanLineWidth}px 100%, 0% 100%)`,
-        [ThemeAnimationDirection.RTL]: `polygon(calc(100% - ${scanLineWidth}px) 0%, 100% 0%, 100% 100%, calc(100% - ${scanLineWidth}px) 100%)`,
-        [ThemeAnimationDirection.TTB]: `polygon(0% 0%, 100% 0%, 100% ${scanLineWidth}px, 0% ${scanLineWidth}px)`,
-        [ThemeAnimationDirection.BTT]: `polygon(0% calc(100% - ${scanLineWidth}px), 100% calc(100% - ${scanLineWidth}px), 100% 100%, 0% 100%)`,
+      // covers the viewport, sweeping toward the opposite edge. Percentage
+      // mask positions keep the strip pinned to its starting edge as it grows.
+      const scanConfig: Record<ThemeAnimationDirection, { position: string; fromSize: string }> = {
+        [ThemeAnimationDirection.LTR]: { position: '0% 0%', fromSize: `${scanLineWidth}px 100%` },
+        [ThemeAnimationDirection.RTL]: { position: '100% 0%', fromSize: `${scanLineWidth}px 100%` },
+        [ThemeAnimationDirection.TTB]: { position: '0% 0%', fromSize: `100% ${scanLineWidth}px` },
+        [ThemeAnimationDirection.BTT]: { position: '0% 100%', fromSize: `100% ${scanLineWidth}px` },
       }
+      const { position, fromSize } =
+        scanConfig[direction as ThemeAnimationDirection] ?? scanConfig[ThemeAnimationDirection.LTR]
 
-      const clipPath = [
-        scanLineStart[direction as ThemeAnimationDirection] ?? scanLineStart[ThemeAnimationDirection.LTR],
-        `polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)`,
-      ]
+      const styleElement = document.createElement('style')
+      styleElement.id = styleId
 
-      try {
-        document.documentElement.animate({ clipPath }, { duration, easing, pseudoElement })
-      } catch {
-        // Some browsers support the View Transition API but not animating its
-        // pseudo-elements via WAAPI options — let the default transition run
-      }
-    }
-
-    if (
-      animationType === ThemeAnimationType.BLUR_CIRCLE ||
-      animationType === ThemeAnimationType.POLYGON_GRADIENT ||
-      (animationType === ThemeAnimationType.GIF && gifUrl)
-    ) {
-      setTimeout(() => {
-        const styleElement = document.getElementById(styleId)
-        if (styleElement) {
-          styleElement.remove()
+      styleElement.textContent = `
+        ${pseudoElement} {
+          mask: linear-gradient(white, white) ${position} / ${fromSize} no-repeat;
+          animation: qrScanReveal ${duration}ms ease-in-out;
+          animation: qrScanReveal ${duration}ms ${easing};
+          animation-fill-mode: both;
+          will-change: mask-size;
         }
-      }, duration)
+
+        @keyframes qrScanReveal {
+          from {
+            mask-size: ${fromSize};
+          }
+          to {
+            mask-size: 100% 100%;
+          }
+        }
+      `
+      document.head.appendChild(styleElement)
     }
+
+    try {
+      await (document as any).startViewTransition(() => {
+        flushSync(() => {
+          setIsDarkMode(willBeDark)
+        })
+        // Apply the theme class synchronously so the "new" snapshot is always
+        // captured in the target theme. Relying on the useEffect alone is racy:
+        // React can defer passive effects past the snapshot capture (seen on
+        // React 18 under load), which breaks the reveal animation.
+        document.documentElement.classList.toggle(globalClassName, willBeDark)
+      }).ready
+    } catch {
+      // The transition was skipped or aborted (e.g. another transition started
+      // or the browser hit its snapshot deadline) — the theme is already
+      // applied, so just let the cleanup below remove the animation styles
+    }
+
+    setTimeout(() => {
+      const styleElement = document.getElementById(styleId)
+      if (styleElement) {
+        styleElement.remove()
+      }
+    }, duration)
   }
 
   useEffect(() => {
